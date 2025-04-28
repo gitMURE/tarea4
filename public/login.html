@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Iniciar Sesión</h2>
+    <form id="loginForm" class="form">
+      <input type="text" id="email" placeholder="Nombre de usuario" required>
+      <input type="password" id="password" placeholder="Contraseña" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <p id="mensaje" class="mensaje"></p>
+  </div>
+
+  <script>
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      fetch("http://localhost:3000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      })
+        .then(res => {
+          if (!res.ok) {
+            throw new Error('Error en la respuesta del servidor');
+          }
+          return res.json();
+        })
+        .then(data => {
+          console.log('Respuesta del servidor:', data);
+
+          if (data.success) {
+            localStorage.setItem('userId', data.userId);
+            localStorage.setItem('username', data.username);
+            window.location.href = "home.html";
+          } else {
+            document.getElementById("mensaje").textContent = "Credenciales incorrectas";
+          }
+        })
+        .catch(error => {
+          console.error('Error en la solicitud:', error);
+          document.getElementById("mensaje").textContent = "Hubo un problema al iniciar sesión. Inténtalo de nuevo más tarde.";
+        });
+    });
+  </script>
+</body>
+</html>
